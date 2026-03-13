@@ -7,7 +7,20 @@ const app: Express = express();
 
 // Middlewares
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'https://paisaalens.vercel.app',
+      process.env.FRONTEND_URL
+    ].filter(Boolean);
+
+    // Allow requests with no origin, matched origins, or any vercel.app subdomain
+    if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
